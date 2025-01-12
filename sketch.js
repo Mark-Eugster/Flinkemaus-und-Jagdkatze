@@ -74,15 +74,15 @@ function draw() {
   } else if (sceneMgr === 2) {
     sceneIntro();
   } else if (sceneMgr === 3) {
-    game(60, 0.05, 20, 20, 200, -200);
+    game(60, 0.05, 0.25, 30, 200, -200);
   }
-  //Game variables: timerlength, reduction of score with each timer cycle, food socre value, claw score demerit, level pass score, lose game score
+  //Game variables: timerlength, reduction of score with each timer cycle, food socre multiplier, claw score demerit, level pass score, lose game score
   else if (sceneMgr === 4 || sceneMgr === 6) {
     sceneMaus();
   } else if (sceneMgr === 5) {
-    game(40, 0.05, 20, 50, 500, 80);
+    game(40, 0.2, 0.4, 50, 500, 80);
   } else if (sceneMgr === 7) {
-    game(30, 0.05, 30, 30, 700, 300);
+    game(30, 0.35, 1, 60, 980, 300);
   } else if (sceneMgr === 8) {
     sceneWin();
   } else if (sceneMgr === 9) {
@@ -94,13 +94,14 @@ class food {
   constructor() {
     this.posX = random(0, 600);
     this.posY = random(0, 600);
-    this.rWidth = random(4, 40);
+    this.rWidth = random(12, 40);
     this.rad = this.rWidth * 0.5;
   }
  
   checkMouse(_fs, _tt) {
     if (dist(this.posX, this.posY, mouseX, mouseY) < this.rad) {
-      score += _fs;
+      let _fsMapped = _fs * this.rWidth
+      score += _fsMapped;
       timer = _tt;
       audioFood.play();
       claw1.interact();
@@ -133,9 +134,9 @@ class claw {
       this.interact();
     }
   }
-  checkMouse(_cs, _tt) {
+  checkMouse(_csMult, _tt) {
     if (dist(this.posX, this.posY, mouseX, mouseY) < this.rad) {
-      score -= _cs;
+      score -= _csMult;
       timer = _tt;
       audioClaw.play();
       for (let food of mouseFood) {
@@ -248,7 +249,7 @@ function sceneDie() {
     rect(300, 450, 320, 36);
     noStroke();
     fill(255);
-    text("Klicken Sie zum Neustart", 210, 454);
+    text("Klicken Sie zum Neustart Level " + lvl, 175, 454);
     clickFlag = 1;
   } else {
     stroke(100);
@@ -256,7 +257,7 @@ function sceneDie() {
     rect(300, 450, 320, 36);
     noStroke();
     fill(150);
-    text("Klicken Sie zum Neustart", 210, 454);
+    text("Klicken Sie zum Neustart Level " + lvl, 175, 454);
     clickFlag = 0;
   }
   cursor();
@@ -342,7 +343,12 @@ function game(_tt, _ts, _fs, _cs, win, die) {
     claw2.interact();
     timer = _tt;
   }
- 
+  let _csMult;
+  let _csThresh = map(score, die, win, 0, 1200);
+  if (_csThresh < 500) { _csMult = _cs * 0.8 }
+    else if (_csThresh < 800) { _csMult = _cs * 1.2  }
+    else { _csMult = _cs * 1.8 }
+
   for (let food of mouseFood) {
     food.checkMouse(_fs, _tt);
   }
@@ -350,8 +356,8 @@ function game(_tt, _ts, _fs, _cs, win, die) {
   for (let food of mouseFood) {
     food.show();
   }
-  claw1.checkMouse(_cs, _tt);
-  claw2.checkMouse(_cs, _tt);
+  claw1.checkMouse(_csMult, _tt);
+  claw2.checkMouse(_csMult, _tt);
   claw1.show();
   claw2.show();
   fill(255);
@@ -380,32 +386,6 @@ else { colR = 0; colG = 255 }
   }
 }
  
-function keyPressed() {
-  if (sceneMgr == 1 || sceneMgr == 4 || sceneMgr == 6) {
-    audioWin.stop();
-    loopFlag = 0;
-    sceneMgr++;
-  } else if (sceneMgr == 8) {
-    audioVictory.stop();
-    loopFlag = 0;
-    sceneMgr = 1;
-  } else if (key === "j" || key === "J") {
-    if (sceneMgr == 2) {
-      sceneMgr++;
-    }
-  } else if (key === "v" || key === "V") {
-    if (sceneMgr == 9) {
-      audioDie.stop();
-      loopFlag = 0;
-      sceneMgr = 1;
-    }
-  } else if (key === "n" || key === "N") {
-    if (sceneMgr == 2) {
-      sceneMgr = 1;
-    }
-  }
-}
- 
 function mousePressed() {
   if (sceneMgr == 1 || sceneMgr == 4 || sceneMgr == 6) {
     if (clickFlag == 1) {
@@ -427,7 +407,10 @@ function mousePressed() {
     if (clickFlag == 1) {
       audioDie.stop();
       loopFlag = 0;
-      sceneMgr = 1;
+      
+    if (lvl == 1) { sceneMgr = 1;}
+    else if (lvl == 2) { sceneMgr = 5; score = 200}
+    else if (lvl == 3) { sceneMgr = 7; score = 500}
     }
   }
 }
