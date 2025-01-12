@@ -363,7 +363,13 @@ function game(_tt, _ts, _fs, _cs, win, die) {
   fill(0, 255, 0);
   text(lvl, 580, 20);
   image(customCursor, mouseX, mouseY, 36, 14);
- 
+ //show a status bar that shows the score, with the bottom end of the bar equal to variable "win" and the top of the bar equal to "die"
+ let barWidth = map(score, die, win, 0, 600);
+  fill(255, 0, 0);
+  rect(300, 590, 600, 20);
+  
+
+
   if (score >= win) {
     sceneMgr++;
   } else if (score <= die) {
