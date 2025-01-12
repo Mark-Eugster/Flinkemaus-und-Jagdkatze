@@ -354,20 +354,23 @@ function game(_tt, _ts, _fs, _cs, win, die) {
   claw2.checkMouse(_cs, _tt);
   claw1.show();
   claw2.show();
-  fill(0);
-  rect(64, 580, 40, 20);
   fill(255);
   noStroke();
   //text(Math.round(score), 52, 580);
-  text(Math.round(score), mouseX, mouseY - 15);
+  //text(Math.round(score), mouseX, mouseY - 15);
   fill(0, 255, 0);
   text(lvl, 580, 20);
-  image(customCursor, mouseX, mouseY, 36, 14);
- //show a status bar that shows the score, with the bottom end of the bar equal to variable "win" and the top of the bar equal to "die"
- let barWidth = map(score, die, win, 0, 600);
-  fill(255, 0, 0);
-  rect(300, 590, barWidth, 20);
-
+ let barWidth = map(score, die, win, 0, 1200);
+ let colR
+ let colG
+ if (barWidth < 500) { colR = 255;
+colG = 0 }
+else if (barWidth < 800) { colR = 255; colG = 255 }
+else { colR = 0; colG = 255 }
+  fill(colR, colG, 0);
+  rect(0, 600, barWidth, 20);
+ // let mausSize = map(score, die, win, 8, 20);
+  image(customCursor, mouseX, mouseY, 38, 14);
 
 
   if (score >= win) {
